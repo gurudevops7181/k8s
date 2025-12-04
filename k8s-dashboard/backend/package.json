@@ -1,0 +1,10 @@
+{
+  "name": "k8s-dashboard-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "@kubernetes/client-node": "^0.20.0"
+  }
+}
