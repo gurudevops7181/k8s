@@ -1,121 +1,154 @@
-Kubernetes Dashboard (Full-Stack App)
+🚀 Kubernetes Mini Dashboard – React + Node.js + Minikube
 
-A full-stack Kubernetes Dashboard built with:
-	•	Backend: Node.js (Express, ES Modules)
-	•	Frontend: React (Vite, TailwindCSS)
-	•	Kubernetes Integration: Custom scripts to fetch Pods, Services, Deployments, and Ingress mappings
+This project is a lightweight Kubernetes Dashboard built using:
+	•	Frontend: React + Vite + TailwindCSS
+	•	Backend: Node.js + Express + Kubernetes Client SDK
+	•	Cluster: Minikube (or any local Kubernetes cluster)
 
-This dashboard provides a simplified UI to visualize Kubernetes resources in any cluster that your kubeconfig has access to.
+It visualizes workload relationships such as:
+	•	Deployment
+	•	Services attached
+	•	Ingress routes
+	•	Running Pods
+	•	Namespaces
 
-⸻
-📁 Project Structure
+	This is ideal for learning Kubernetes object relationships and building a custom internal UI.
+📂 Project Structure
+
 k8s-dashboard/
-│
 ├── backend/
-│   ├── package.json
 │   ├── server.mjs
-│   └── k8s/
-│       ├── fetchResources.mjs
-│       └── findMatchingIngresses.js
-│
-├── frontend/
 │   ├── package.json
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   └── src/
-│       ├── App.jsx
-│       ├── main.jsx
-│       ├── api.js
-│       ├── components/
-│       │   ├── WorkloadCard.jsx
-│       │   ├── PodCard.jsx
-│       │   ├── ServiceCard.jsx
-│       │   ├── IngressCard.jsx
-│       │   └── Diagram.jsx
-│       └── index.css
+│   ├── k8s/
+│   │   ├── fetchResources.mjs
+│   │   └── findMatchingIngresses.js
+│   └── node_modules/
 │
-└── README.md
+└── frontend/
+    ├── index.html
+    ├── package.json
+    ├── postcss.config.cjs
+    ├── tailwind.config.cjs
+    └── src/
+        ├── App.jsx
+        ├── api.js
+        ├── index.css
+        ├── components/
+        │   ├── WorkloadCard.jsx
+        │   ├── ServiceCard.jsx
+        │   ├── PodsCard.jsx
+        │   ├── IngressCard.jsx
+        │   └── Diagram.jsx
 
 
-🖥️ Features
 
-Backend
+🧩 Features
 
-✔ Fetch Kubernetes resources
-✔ Pods, Deployments, Services, Ingresses
-✔ Ingress → Service → Pod matching
-✔ Lightweight Express server
-✔ Uses local kubeconfig (same as kubectl)
+✔ Fetch Namespaces
 
-Frontend
+Lists namespaces dynamically from Kubernetes API.
 
-✔ Clean UI with TailwindCSS
-✔ Live resource cards
-✔ Relationship diagram (Ingress → Service → Pod)
-✔ API communication with backend
-✔ Vite-powered fast development environment
+✔ Fetch Workload Details
 
+For a selected namespace + deployment:
+	•	Deployment details
+	•	Related service(s)
+	•	Related ingress rules
+	•	Related pods
 
-⚙️ Backend Setup (Node.js + Express)
-1️⃣ Navigate to backend
-cd backend
-2️⃣ Install dependencies
-npm install
-3️⃣ Start backend server
-node server.mjs
-Backend Default Port
-http://localhost:3000
+✔ Automatic Matching Logic
 
-Kubernetes Access
+The backend links objects using:
+	•	metadata.labels
+	•	spec.selector.matchLabels
+	•	Ingress backend service references
 
-Backend reads your kubeconfig from:
-~/.kube/config
-If you want to specify another file:
-export KUBECONFIG=/path/to/config
+✔ Interactive UI
 
-
-🎨 Frontend Setup (React + Vite)
-
-1️⃣ Navigate to frontend
-cd frontend
-2️⃣ Install dependencies
-npm install
-3️⃣ Start UI
-npm run dev
-Vite default UI URL:
-http://localhost:5173
-
-🔗 API Endpoints
-
-GET /api/resources
-
-Fetch all cluster resources:
-	•	Pods
-	•	Deployments
+React UI shows:
+	•	Deployment overview
 	•	Services
+	•	Pods
 	•	Ingress
+	•	Connection diagram (optional visual graph)
 
-GET /api/ingress/match
 
-Matches:
-Ingress → Service → Pods
-Output example:
+
+
+
+
+	🔧 Backend (Node.js + Express)
+Start Backend
+cd backend
+npm install
+node server.mjs
+
+Backend runs at:
+http://localhost:9000
+
+📡 API Endpoints
+1. Get Namespaces
+   GET /api/namespaces
+Response:
 {
-  "ingress": "my-app",
-  "service": "my-service",
-  "pods": ["my-app-7d4f45f8c7-x92bc", "my-app-7d4f45f8c7-wk2dp"]
+  "namespaces": ["default", "demo", "kube-system"]
 }
 
-🚀 How It Works (Flow)
+2. Get Workload + Related Objects
+   GET /api/workload?namespace=demo&deployment=demo-app
 
-1️⃣ Backend connects to Kubernetes using kubeconfig
-2️⃣ Fetches resources via Kubernetes API
-3️⃣ Normalizes and sends data to frontend
-4️⃣ Frontend displays:
-	•	Pods
-	•	Services
-	•	Deployments
-	•	Ingress
-5️⃣ Diagram visually connects:
-Ingress → Service → Pod
+   Response contains:
+   {
+  "workload": {},
+  "matchingServices": [],
+  "matchingIngresses": [],
+  "pods": [],
+  "namespaces": []
+}
+
+
+🎨 Frontend (React + Vite + TailwindCSS)
+
+Start Frontend
+cd frontend
+npm install
+npm run dev
+
+Frontend runs at:
+http://localhost:5173
+
+⚙ TailwindCSS Configuration
+
+tailwind.config.cjs
+
+module.exports = {
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  theme: { extend: {} },
+  plugins: [],
+};
+
+
+postcss.config.cjs
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+
+🐳 Minikube Setup
+
+
+Apply sample app:
+
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl apply -f ingress.yaml
+
+Add host entry:
+sudo nano /etc/hosts
+192.168.49.2   demo.local
+
+![Dashboard Screenshot](images/<img width="973" height="965" alt="image" src="https://github.com/user-attachments/assets/a79d0f91-89e9-4f69-a019-823cbb4824b1" />
+)
