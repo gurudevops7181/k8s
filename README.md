@@ -40,8 +40,6 @@ k8s-dashboard/
         │   ├── IngressCard.jsx
         │   └── Diagram.jsx
 
-
-
 🧩 Features
 
 ✔ Fetch Namespaces
@@ -71,12 +69,6 @@ React UI shows:
 	•	Pods
 	•	Ingress
 	•	Connection diagram (optional visual graph)
-
-
-
-
-
-
 	🔧 Backend (Node.js + Express)
 Start Backend
 cd backend
@@ -105,8 +97,6 @@ Response:
   "pods": [],
   "namespaces": []
 }
-
-
 🎨 Frontend (React + Vite + TailwindCSS)
 
 Start Frontend
@@ -126,8 +116,6 @@ module.exports = {
   theme: { extend: {} },
   plugins: [],
 };
-
-
 postcss.config.cjs
 module.exports = {
   plugins: {
@@ -135,11 +123,7 @@ module.exports = {
     autoprefixer: {},
   },
 };
-
-
 🐳 Minikube Setup
-
-
 Apply sample app:
 
 kubectl apply -f deployment.yaml
@@ -149,6 +133,4 @@ kubectl apply -f ingress.yaml
 Add host entry:
 sudo nano /etc/hosts
 192.168.49.2   demo.local
-
-![Dashboard Screenshot](images/<img width="973" height="965" alt="image" src="https://github.com/user-attachments/assets/a79d0f91-89e9-4f69-a019-823cbb4824b1" />
-)
+![Dashboard Screenshot](https://github.com/user-attachments/assets/a79d0f91-89e9-4f69-a019-823cbb4824b1)
