@@ -1,136 +1,94 @@
-🚀 Kubernetes Mini Dashboard – React + Node.js + Minikube
+# Kubernetes Mini Dashboard
 
-This project is a lightweight Kubernetes Dashboard built using:
-	•	Frontend: React + Vite + TailwindCSS
-	•	Backend: Node.js + Express + Kubernetes Client SDK
-	•	Cluster: Minikube (or any local Kubernetes cluster)
+A small local web app for inspecting a Kubernetes Deployment and its related Pods, Services, and Ingresses. The frontend is built with React and Vite; a Node.js/Express API reads cluster resources through the Kubernetes client.
 
-It visualizes workload relationships such as:
-	•	Deployment
-	•	Services attached
-	•	Ingress routes
-	•	Running Pods
-	•	Namespaces
+## Features
 
-	This is ideal for learning Kubernetes object relationships and building a custom internal UI.
-📂 Project Structure
+- Lists namespaces available to the configured Kubernetes identity.
+- Loads a Deployment by namespace and name.
+- Shows Pods selected by the Deployment's labels, matching Services, and Ingresses that route to those Services.
+- Uses the kubeconfig available to the backend process (normally `~/.kube/config`).
+- Includes a diagram panel that is currently a placeholder.
 
-k8s-dashboard/
-├── backend/
-│   ├── server.mjs
-│   ├── package.json
-│   ├── k8s/
-│   │   ├── fetchResources.mjs
-│   │   └── findMatchingIngresses.js
-│   └── node_modules/
-│
-└── frontend/
-    ├── index.html
-    ├── package.json
-    ├── postcss.config.cjs
-    ├── tailwind.config.cjs
-    └── src/
-        ├── App.jsx
-        ├── api.js
-        ├── index.css
-        ├── components/
-        │   ├── WorkloadCard.jsx
-        │   ├── ServiceCard.jsx
-        │   ├── PodsCard.jsx
-        │   ├── IngressCard.jsx
-        │   └── Diagram.jsx
+The dashboard makes read-only Kubernetes API requests. It does not create or modify cluster resources.
 
-🧩 Features
+## Repository layout
 
-✔ Fetch Namespaces
+```text
+.
+├── README.md
+└── k8s-dashboard/
+    ├── backend/     # Express API and Kubernetes client
+    └── frontend/    # React and Vite UI
+```
 
-Lists namespaces dynamically from Kubernetes API.
+## Requirements
 
-✔ Fetch Workload Details
+- Node.js 18 or newer, with npm
+- Access to a Kubernetes cluster
+- `kubectl` configured for that cluster, or another kubeconfig available to the backend process
 
-For a selected namespace + deployment:
-	•	Deployment details
-	•	Related service(s)
-	•	Related ingress rules
-	•	Related pods
+The Kubernetes identity used by the backend needs permission to list namespaces and to read Deployments, Pods, Services, and Ingresses. Namespace listing is cluster-wide; workload resources are read in the selected namespace.
 
-✔ Automatic Matching Logic
+## Run locally
 
-The backend links objects using:
-	•	metadata.labels
-	•	spec.selector.matchLabels
-	•	Ingress backend service references
+Install dependencies in each app directory:
 
-✔ Interactive UI
+```sh
+cd k8s-dashboard/backend
+npm ci
 
-React UI shows:
-	•	Deployment overview
-	•	Services
-	•	Pods
-	•	Ingress
-	•	Connection diagram (optional visual graph)
-	🔧 Backend (Node.js + Express)
-Start Backend
-cd backend
-npm install
+cd ../frontend
+npm ci
+```
+
+Start the backend in one terminal:
+
+```sh
+cd k8s-dashboard/backend
 node server.mjs
+```
 
-Backend runs at:
-http://localhost:9000
+It listens on <http://localhost:9000>.
 
-📡 API Endpoints
-1. Get Namespaces
-   GET /api/namespaces
-Response:
-{
-  "namespaces": ["default", "demo", "kube-system"]
-}
+Start the frontend in a second terminal:
 
-2. Get Workload + Related Objects
-   GET /api/workload?namespace=demo&deployment=demo-app
-
-   Response contains:
-   {
-  "workload": {},
-  "matchingServices": [],
-  "matchingIngresses": [],
-  "pods": [],
-  "namespaces": []
-}
-🎨 Frontend (React + Vite + TailwindCSS)
-
-Start Frontend
-cd frontend
-npm install
+```sh
+cd k8s-dashboard/frontend
 npm run dev
+```
 
-Frontend runs at:
-http://localhost:5173
+Open the Vite URL shown in the terminal (typically <http://localhost:5173>). The frontend currently sends API requests to `http://localhost:9000/api`.
 
-⚙ TailwindCSS Configuration
+## API
 
-tailwind.config.cjs
+### `GET /api/namespaces`
 
-module.exports = {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
-  theme: { extend: {} },
-  plugins: [],
-};
-postcss.config.cjs
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-};
-🐳 Minikube Setup
-Apply sample app:
+Returns the namespaces visible to the configured Kubernetes identity:
 
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-kubectl apply -f ingress.yaml
+```json
+{
+  "namespaces": ["default", "kube-system"]
+}
+```
 
-Add host entry:
-sudo nano /etc/hosts
-192.168.49.2   demo.local
-![Dashboard Screenshot](https://github.com/user-attachments/assets/a79d0f91-89e9-4f69-a019-823cbb4824b1)
+### `GET /api/workload?namespace=<namespace>&deployment=<deployment>`
+
+Returns the selected Deployment, Pods matched by its selector, matching Services, matching Ingresses, and the namespace list. For example:
+
+```sh
+curl 'http://localhost:9000/api/workload?namespace=default&deployment=web'
+```
+
+The response fields are `workload`, `pods`, `matchingServices`, `matchingIngresses`, and `namespaces`. If the query parameters are omitted, the backend defaults to namespace `demo` and Deployment `demo-app`.
+
+## Frontend production build
+
+To create the static frontend bundle:
+
+```sh
+cd k8s-dashboard/frontend
+npm run build
+```
+
+The generated files are written to `k8s-dashboard/frontend/dist/`.

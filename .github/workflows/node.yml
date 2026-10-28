@@ -1,0 +1,56 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: self-hosted
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: k8s-dashboard/backend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: k8s-dashboard/backend
+
+      - name: Check backend JavaScript syntax
+        run: |
+          node --check server.mjs
+          node --check k8s/fetchResources.mjs
+          node --check k8s/findMatchingIngresses.js
+        working-directory: k8s-dashboard/backend
+
+  frontend:
+    runs-on: self-hosted
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: k8s-dashboard/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: k8s-dashboard/frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: k8s-dashboard/frontend

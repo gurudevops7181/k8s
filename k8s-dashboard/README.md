@@ -1,107 +1,35 @@
-# Kubernetes Dashboard (Custom Mini Dashboard)
+# Kubernetes Mini Dashboard
 
-A lightweight Kubernetes dashboard built using:
+A local React and Express app for viewing a Kubernetes Deployment and its related Pods, Services, and Ingresses. The backend reads cluster resources using the kubeconfig available to its process.
 
-- React + Vite (frontend)
-- Node.js + Express (backend)
-- Kubernetes client-node SDK
+For full requirements, Kubernetes permissions, API details, and build instructions, see the [repository README](../README.md).
 
-This project displays:
-- Deployment details
-- Pod details
-- Matching Services
-- Matching Ingress resources
-- Simple architecture diagram (placeholder)
+## Quick start
 
----
+Requirements: Node.js 18 or newer, npm, and access to a Kubernetes cluster through a configured kubeconfig.
 
-## 🚀 Features
+Run these commands from the `k8s-dashboard/` directory:
 
-✔ Fetch namespaces dynamically  
-✔ View deployments across any namespace  
-✔ Display workload, pods, services, and ingress details  
-✔ Clean UI with TailwindCSS  
-✔ Backend auto-loads kubeconfig from your local machine  
-
----
-
-## 📁 Project Structure
-k8s-dashboard/
-│
-├── backend/      → Node.js (Express) backend API
-├── frontend/     → React UI Dashboard
-└── README.md
-
-
----
-
-## 🛠 Requirements
-
-- Node.js 18+  
-- Minikube / Kubernetes cluster  
-- `kubectl` configured (`~/.kube/config` is used automatically)
-
----
-
-## 📦 Install Dependencies
-
-### 1️⃣ Backend
+```sh
 cd backend
-npm install
+npm ci
 
-### 2️⃣ Frontend
-cd frontend
-npm install
----
+cd ../frontend
+npm ci
+```
 
-## ▶️ Running the Dashboard
+Start the backend in one terminal, from `k8s-dashboard/`:
 
-### Start Backend API
+```sh
 cd backend
 node server.mjs
+```
 
-The backend will start at:
-http://localhost:9000
+Start the frontend in another terminal, also from `k8s-dashboard/`:
 
-### Start Frontend
+```sh
 cd frontend
 npm run dev
-Frontend runs at:
-http://localhost:5173
+```
 
----
-
-## 🔧 API Endpoints
-
-### GET /api/namespaces
-Returns all namespaces:
-
-{
-“namespaces”: [“default”, “kube-system”, “demo”]
-}
-
-### GET /api/workload?namespace=demo&deployment=demo-app
-Returns:
-- workload
-- pods
-- services
-- ingresses
-
-Example:
-
-
-http://localhost:9000/api/workload?namespace=demo&deployment=demo-app
-
----
-
-## 🐳 Kubernetes Permissions
-
-Your kubeconfig must have permissions to:
-
-- list pods
-- list deployments
-- list services
-- list ingresses
-- list namespaces
-
----
+The backend listens on <http://localhost:9000>. Open the Vite URL shown in the frontend terminal, typically <http://localhost:5173>.
